@@ -4,7 +4,8 @@ import { Home, Search, Library, Heart, ShieldCheck, ListMusic, PlusSquare } from
 import Box from '../Box';
 import SidebarItem from './SidebarItem';
 import useAdmin from '../../hooks/useAdmin'; 
-import useUploadModal from '../../hooks/useUploadModal';
+import useUploadModal from '../../hooks/useUploadModal'; 
+import useAuthModal from '../../hooks/useAuthModal'; 
 import { supabase } from '../../services/supabaseClient';
 
 const Sidebar = ({ children }) => {
@@ -12,27 +13,42 @@ const Sidebar = ({ children }) => {
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
   const uploadModal = useUploadModal();
+  const authModal = useAuthModal(); 
+  
   const [playlists, setPlaylists] = useState([]);
+  const [user, setUser] = useState(null);
 
-  // Fetch Playlists User
+  // 4. CEK SESSION USER (Mirip seperti di Header/MobileMenu)
   useEffect(() => {
+    // Cek session awal
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Fetch playlist
     const fetchPlaylists = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
-
       const { data } = await supabase
         .from('playlists')
         .select('*')
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false });
-      
       if (data) setPlaylists(data);
     };
 
     fetchPlaylists();
-    
-    
   }, []);
+
+  // 5. FUNGSI PENGECEKAN LOGIN
+  const handleUploadClick = () => {
+    if (!user) {
+      // Jika belum login, buka modal Login
+      return authModal.onOpen();
+    }
+    // Jika sudah login, buka modal Upload
+    return uploadModal.onOpen();
+  };
 
   const routes = useMemo(() => [
     { icon: Home, label: 'Home', active: location.pathname === '/', href: '/' },
@@ -49,13 +65,16 @@ const Sidebar = ({ children }) => {
             {routes.map((item) => (
               <SidebarItem key={item.label} {...item} />
             ))}
+
+            {/* 6. GUNAKAN FUNGSI handleUploadClick DI SINI */}
             <div 
-               onClick={uploadModal.onOpen}
+               onClick={handleUploadClick} 
                className="flex flex-row h-auto items-center w-full gap-x-4 text-md font-medium cursor-pointer hover:text-white transition text-neutral-400 py-1"
             >
                <PlusSquare size={26} />
                <p className="truncate w-full">Upload Song</p>
             </div>
+
           </div>
         </Box>
         
@@ -63,7 +82,7 @@ const Sidebar = ({ children }) => {
            <div className="p-5 flex flex-col gap-y-2">
              <div className="text-neutral-400 font-medium text-sm pl-2 mb-2">Your Library</div>
              
-             {/* 1. LIKED SONGS (Hardcoded Item) */}
+             {/* Liked Songs */}
              <div 
                onClick={() => navigate('/library', { state: { tab: 'liked' } })} 
                className="flex items-center gap-x-3 text-neutral-400 hover:text-white cursor-pointer transition p-2 hover:bg-white/5 rounded-md"
@@ -74,11 +93,10 @@ const Sidebar = ({ children }) => {
                 <p className="font-medium truncate">Liked Songs</p>
              </div>
 
-             {/* 2. USER PLAYLISTS (Dynamic) */}
-            {playlists.map((playlist) => (
+             {/* User Playlists */}
+             {playlists.map((playlist) => (
                <div 
                  key={playlist.id}
-                 // UPDATE: Arahkan ke halaman playlist spesifik
                  onClick={() => navigate(`/playlist/${playlist.id}`)} 
                  className="flex items-center gap-x-3 text-neutral-400 hover:text-white cursor-pointer transition p-2 hover:bg-white/5 rounded-md"
                >
