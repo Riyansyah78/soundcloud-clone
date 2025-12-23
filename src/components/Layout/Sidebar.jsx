@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom'; 
-import { Home, Search, Library, Heart, ShieldCheck, ListMusic } from 'lucide-react'; 
+import { Home, Search, Library, Heart, ShieldCheck, ListMusic, PlusSquare } from 'lucide-react'; 
 import Box from '../Box';
 import SidebarItem from './SidebarItem';
 import useAdmin from '../../hooks/useAdmin'; 
