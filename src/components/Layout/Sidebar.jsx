@@ -4,12 +4,14 @@ import { Home, Search, Library, Heart, ShieldCheck, ListMusic } from 'lucide-rea
 import Box from '../Box';
 import SidebarItem from './SidebarItem';
 import useAdmin from '../../hooks/useAdmin'; 
+import useUploadModal from '../../hooks/useUploadModal';
 import { supabase } from '../../services/supabaseClient';
 
 const Sidebar = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
+  const uploadModal = useUploadModal();
   const [playlists, setPlaylists] = useState([]);
 
   // Fetch Playlists User
@@ -47,6 +49,13 @@ const Sidebar = ({ children }) => {
             {routes.map((item) => (
               <SidebarItem key={item.label} {...item} />
             ))}
+            <div 
+               onClick={uploadModal.onOpen}
+               className="flex flex-row h-auto items-center w-full gap-x-4 text-md font-medium cursor-pointer hover:text-white transition text-neutral-400 py-1"
+            >
+               <PlusSquare size={26} />
+               <p className="truncate w-full">Upload Song</p>
+            </div>
           </div>
         </Box>
         
