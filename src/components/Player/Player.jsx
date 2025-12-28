@@ -68,22 +68,25 @@ const Player = () => {
     urlRef.current = songPathUrl;
   }
 
-  // 3. Loop Animasi Waktu (Update posisi saat playing)
+  // 3. Update time position at intervals (lighter than requestAnimationFrame)
   useEffect(() => {
-    let animationFrameId;
+    let intervalId;
     
-    const updateSeek = () => {
-      if (soundRef.current && player.isPlaying && !isSeekingRef.current) {
-        const currentSeek = soundRef.current.seek();
-        setSeek(currentSeek);
-        player.setCurrentTime(currentSeek);
-      }
-      animationFrameId = requestAnimationFrame(updateSeek);
+    if (player.isPlaying) {
+      intervalId = setInterval(() => {
+        if (soundRef.current && !isSeekingRef.current) {
+          const currentSeek = soundRef.current.seek();
+          if (typeof currentSeek === 'number') {
+            setSeek(currentSeek);
+            player.setCurrentTime(currentSeek);
+          }
+        }
+      }, 250); // Update every 250ms instead of every frame
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
     };
-
-    animationFrameId = requestAnimationFrame(updateSeek);
-
-    return () => cancelAnimationFrame(animationFrameId);
   }, [player.isPlaying]);
 
   // 4. Handle Seek (Geser Slider)
@@ -135,12 +138,45 @@ const Player = () => {
     player.setIsPlaying(false);
     setSeek(0);
     player.setCurrentTime(0);
+    // Auto play next song when current song ends
+    onPlayNext();
+  };
+
+  // 7. Play Next Song
+  const onPlayNext = () => {
+    if (player.ids.length === 0) return;
+    
+    const currentIndex = player.ids.findIndex((id) => id === player.activeId);
+    
+    const nextSong = player.ids[currentIndex + 1];
+    
+    if (nextSong === undefined) {
+      // If at the end, go back to first song
+      return player.setId(player.ids[0]);
+    }
+    
+    player.setId(nextSong);
+  };
+
+  // 8. Play Previous Song
+  const onPlayPrevious = () => {
+    if (player.ids.length === 0) return;
+    
+    const currentIndex = player.ids.findIndex((id) => id === player.activeId);
+    const previousSong = player.ids[currentIndex - 1];
+    
+    if (previousSong === undefined) {
+      // If at the beginning, go to last song
+      return player.setId(player.ids[player.ids.length - 1]);
+    }
+    
+    player.setId(previousSong);
   };
 
   if (!player.activeId || !urlRef.current || !song) return null;
 
   return (
-    <div className="fixed bottom-0 bg-black w-full py-2 h-[80px] px-4 text-white border-t border-neutral-800 z-50">
+    <div className="fixed bottom-0 bg-black w-full py-2 h-[80px] px-4 text-white border-t border-neutral-800 z-50 pointer-events-auto">
       <ReactHowler
         ref={soundRef}
         src={urlRef.current}
@@ -161,6 +197,8 @@ const Player = () => {
         songUrl={urlRef.current}
         isPlaying={player.isPlaying} 
         setIsPlaying={togglePlay} 
+        onPlayNext={onPlayNext}
+        onPlayPrevious={onPlayPrevious}
         volume={volume}
         setVolume={setVolume}
         currentTime={seek}

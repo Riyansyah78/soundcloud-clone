@@ -46,23 +46,25 @@ const PlayerContent = ({
       <div className="flex flex-col items-center justify-center w-full md:flex gap-y-1">
         
         {/* Tombol Kontrol */}
-        <div className="flex items-center justify-center gap-x-6">
-          <SkipBack 
-            onClick={onPlayPrevious} 
-            size={20} 
-            className="text-neutral-400 cursor-pointer hover:text-white transition" 
-          />
-          <div 
+        <div className="flex items-center justify-center gap-x-4">
+          <button 
+            onClick={onPlayPrevious}
+            className="p-2 text-neutral-400 hover:text-white transition active:scale-95"
+          >
+            <SkipBack size={20} />
+          </button>
+          <button 
             onClick={() => setIsPlaying(!isPlaying)} 
-            className="flex items-center justify-center h-8 w-8 rounded-full bg-white p-1 cursor-pointer hover:scale-110 transition"
+            className="flex items-center justify-center h-8 w-8 rounded-full bg-white p-1 hover:scale-110 transition active:scale-95"
           >
             <Icon size={20} className="text-black" fill="black" />
-          </div>
-          <SkipForward 
-            onClick={onPlayNext} 
-            size={20} 
-            className="text-neutral-400 cursor-pointer hover:text-white transition" 
-          />
+          </button>
+          <button 
+            onClick={onPlayNext}
+            className="p-2 text-neutral-400 hover:text-white transition active:scale-95"
+          >
+            <SkipForward size={20} />
+          </button>
         </div>
 
         {/* SeekBar */}

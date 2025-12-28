@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, Library, PlusSquare, User } from 'lucide-react';
 import useUploadModal from '../../hooks/useUploadModal';
 import useAuthModal from '../../hooks/useAuthModal';
+import usePlayerStore from '../../store/usePlayerStore';
 import { supabase } from '../../services/supabaseClient';
 
 const MobileBottomBar = () => {
@@ -10,7 +11,11 @@ const MobileBottomBar = () => {
   const navigate = useNavigate();
   const uploadModal = useUploadModal();
   const authModal = useAuthModal();
+  const player = usePlayerStore();
   const [user, setUser] = useState(null);
+  
+  // Check if player is active (has a song loaded)
+  const isPlayerActive = !!player.activeId;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -74,16 +79,18 @@ const MobileBottomBar = () => {
   ];
 
   return (
-    <nav className="
+    <nav className={`
       md:hidden 
-      fixed bottom-0 left-0 right-0 
-      z-40
-      bg-gradient-to-t from-black via-black/95 to-black/80
-      backdrop-blur-lg
-      border-t border-white/10
-      px-2 pt-2 pb-safe
-      safe-area-inset-bottom
-    ">
+      fixed left-0 right-0 
+      z-[60]
+      bg-black
+      px-2 py-2
+      transition-all duration-300 ease-in-out
+      ${isPlayerActive 
+        ? 'bottom-[80px] border-b border-neutral-800' 
+        : 'bottom-0 border-t border-neutral-800'
+      }
+    `}>
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => (
           <button
@@ -91,35 +98,23 @@ const MobileBottomBar = () => {
             onClick={item.onClick}
             className={`
               flex flex-col items-center justify-center
-              py-2 px-3
-              min-w-[60px]
-              rounded-xl
+              py-1 px-2
+              min-w-[50px]
+              rounded-lg
               transition-all duration-200
               ${item.active 
-                ? 'text-sc-orange scale-105' 
+                ? 'text-sc-orange' 
                 : 'text-neutral-400 hover:text-white active:scale-95'
               }
             `}
           >
-            <div className={`
-              relative p-2 rounded-xl transition-all duration-200
-              ${item.active 
-                ? 'bg-sc-orange/20' 
-                : 'hover:bg-white/10'
-              }
-            `}>
-              <item.icon 
-                size={22} 
-                strokeWidth={item.active ? 2.5 : 2}
-                className="transition-all duration-200"
-              />
-              {item.active && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-sc-orange rounded-full" />
-              )}
-            </div>
+            <item.icon 
+              size={20} 
+              strokeWidth={item.active ? 2.5 : 2}
+              className="transition-all duration-200"
+            />
             <span className={`
-              text-[10px] mt-1 font-medium
-              transition-all duration-200
+              text-[9px] mt-0.5 font-medium
               ${item.active ? 'opacity-100' : 'opacity-70'}
             `}>
               {item.label}

@@ -25,6 +25,13 @@ const Sidebar = ({ children }) => {
       setUser(session?.user ?? null);
     });
 
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
     // Fetch playlist
     const fetchPlaylists = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -38,6 +45,11 @@ const Sidebar = ({ children }) => {
     };
 
     fetchPlaylists();
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   // 5. LOGIN CHECK FUNCTION

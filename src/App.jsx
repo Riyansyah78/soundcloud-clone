@@ -22,7 +22,6 @@ function App() {
       <AuthModal />
       <UploadModal />
       <MobileMenu />
-      <MobileBottomBar />
       <div className="flex h-screen bg-sc-dark text-white">
         
         {/* Sidebar: Fixed width di kiri */}
@@ -33,7 +32,7 @@ function App() {
           
           <Header />
           
-          <div className="flex-1 overflow-y-auto px-6 py-2 pb-32 md:pb-24">
+          <div id="main-content" className="flex-1 overflow-y-auto px-6 py-2 pb-40 md:pb-24">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<Search />} />
@@ -50,6 +49,7 @@ function App() {
         </main>
         
         <Player />
+        <MobileBottomBar />
       
       </div>
     </Router>

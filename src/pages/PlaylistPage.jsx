@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 import usePlayerStore from '../store/usePlayerStore';
 import useLoadImage from '../hooks/useLoadImage';
-import { Play, Clock, Trash2, Music } from 'lucide-react';
+import { Play, Clock, Trash2, Music, ImagePlus } from 'lucide-react';
 import { timeAgo } from '../utils/formatDate';
 
 const PlaylistPage = () => {
@@ -12,6 +12,13 @@ const PlaylistPage = () => {
   const navigate = useNavigate();
   const [playlist, setPlaylist] = useState(null);
   const [songs, setSongs] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Compute playlist image URL
+  const playlistImageUrl = playlist?.image_path 
+    ? supabase.storage.from('images').getPublicUrl(playlist.image_path).data.publicUrl 
+    : null;
 
   useEffect(() => {
     const fetchPlaylistData = async () => {
@@ -36,9 +43,56 @@ const PlaylistPage = () => {
   }, [id]);
 
   const handlePlay = (songId) => {
+    // Get all song IDs from this playlist
+    const allSongIds = songs.map(s => s.id);
     player.setId(songId);
-    player.setIds([songId]);
+    player.setIds(allSongIds);
     player.setIsPlaying(true);
+  };
+
+  // Play all songs starting from the first one
+  const handlePlayAll = () => {
+    if (songs.length === 0) return;
+    const allSongIds = songs.map(s => s.id);
+    player.setId(allSongIds[0]);
+    player.setIds(allSongIds);
+    player.setIsPlaying(true);
+  };
+
+  // Handle image upload for playlist cover
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `playlist_${id}_${Date.now()}.${fileExt}`;
+      const filePath = `playlists/${fileName}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // Update playlist record with image path
+      const { error: updateError } = await supabase
+        .from('playlists')
+        .update({ image_path: filePath })
+        .eq('id', Number(id));
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      setPlaylist(prev => ({ ...prev, image_path: filePath }));
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleDeleteSong = async (songId) => {
@@ -66,10 +120,35 @@ const PlaylistPage = () => {
 
   return (
     <div className="bg-neutral-900 min-h-full rounded-lg overflow-hidden">
+      {/* Hidden file input for image upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageUpload}
+        accept="image/*"
+        className="hidden"
+      />
+
       {/* HEADER */}
       <div className="bg-gradient-to-b from-neutral-700 to-neutral-900 p-8 flex flex-col md:flex-row gap-6 items-end">
-        <div className="w-40 h-40 bg-neutral-800 shadow-2xl flex items-center justify-center rounded-md">
-           <Music size={64} className="text-neutral-500" />
+        {/* Clickable image container */}
+        <div 
+          onClick={() => fileInputRef.current?.click()}
+          className="w-40 h-40 bg-neutral-800 shadow-2xl flex items-center justify-center rounded-md cursor-pointer group relative overflow-hidden hover:opacity-90 transition"
+        >
+          {playlistImageUrl ? (
+            <img src={playlistImageUrl} alt="Playlist cover" className="w-full h-full object-cover" />
+          ) : (
+            <Music size={64} className="text-neutral-500" />
+          )}
+          {/* Overlay on hover */}
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+            {isUploading ? (
+              <span className="text-white text-sm animate-pulse">Uploading...</span>
+            ) : (
+              <ImagePlus size={32} className="text-white" />
+            )}
+          </div>
         </div>
         <div className="flex flex-col gap-2 w-full">
            <p className="text-sm font-bold uppercase text-white">Playlist</p>
@@ -86,7 +165,11 @@ const PlaylistPage = () => {
       <div className="p-6">
          {/* Action Bar */}
          <div className="flex items-center justify-between mb-8">
-            <button className="bg-sc-orange w-14 h-14 rounded-full flex items-center justify-center hover:scale-105 transition shadow-lg">
+            <button 
+              onClick={handlePlayAll}
+              disabled={songs.length === 0}
+              className="bg-sc-orange w-14 h-14 rounded-full flex items-center justify-center hover:scale-105 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
                <Play fill="white" className="ml-1 text-white" size={28}/>
             </button>
             <button onClick={handleDeletePlaylist} className="text-neutral-400 hover:text-red-500 transition text-sm font-bold flex items-center gap-2">

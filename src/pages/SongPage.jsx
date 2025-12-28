@@ -194,7 +194,9 @@ const SongPage = () => {
       player.togglePlay();
     } else {
       player.setId(song.id);
-      player.setIds([song.id]); 
+      // Combine current song with related songs for the playlist
+      const playlistIds = [song.id, ...relatedSongs.map(s => s.id)];
+      player.setIds(playlistIds);  
       player.setIsPlaying(true);
       const { error } = await supabase.rpc('increment_play_count', { row_id: id });
       if (!error) setPlayCount(prev => prev + 1);

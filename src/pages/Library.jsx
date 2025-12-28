@@ -66,9 +66,11 @@ const Library = () => {
     if (plData) setMyPlaylists(plData);
   };
 
-  const handlePlay = (id) => {
+  const handlePlay = (id, songList = []) => {
+    // Get all song IDs from the provided list
+    const allSongIds = songList.length > 0 ? songList.map(s => s.id) : [id];
     player.setId(id);
-    player.setIds([id]);
+    player.setIds(allSongIds);
     player.setIsPlaying(true);
   };
 
@@ -115,7 +117,7 @@ const Library = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                {historySongs.slice(0,6).map((song, i) => (
-                   <LibrarySongItem key={i} song={song} onClick={() => handlePlay(song.id)} icon={Clock} subtitle="Recently played"/>
+                   <LibrarySongItem key={i} song={song} onClick={() => handlePlay(song.id, historySongs)} icon={Clock} subtitle="Recently played"/>
                ))}
             </div>
           </section>
@@ -145,7 +147,15 @@ const Library = () => {
                  >
                     <div className="w-full aspect-square bg-neutral-700 rounded-md mb-3 flex items-center justify-center shadow-lg group-hover:shadow-xl transition relative overflow-hidden">
                        {/* If image_path exists, display it; otherwise use default icon */}
-                       <ListMusic size={40} className="text-neutral-500 group-hover:text-white transition duration-300 transform group-hover:scale-110"/>
+                       {pl.image_path ? (
+                         <img 
+                           src={supabase.storage.from('images').getPublicUrl(pl.image_path).data.publicUrl} 
+                           alt="Playlist cover" 
+                           className="w-full h-full object-cover"
+                         />
+                       ) : (
+                         <ListMusic size={40} className="text-neutral-500 group-hover:text-white transition duration-300 transform group-hover:scale-110"/>
+                       )}
                        
                        {/* Play Icon Overlay on hover (Optional, for better aesthetics) */}
                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
@@ -172,12 +182,12 @@ const Library = () => {
     return activeTab === 'liked' ? (
        <div className="flex flex-col gap-1">
           <h2 className="text-white text-3xl font-bold mb-4">Liked Songs</h2>
-          {likedSongs.map(s => <LibrarySongItem key={s.id} song={s} onClick={() => handlePlay(s.id)}/>)}
+          {likedSongs.map(s => <LibrarySongItem key={s.id} song={s} onClick={() => handlePlay(s.id, likedSongs)}/>)}
        </div>
     ) : (
        <div className="flex flex-col gap-1">
           <h2 className="text-white text-3xl font-bold mb-4">Listening History</h2>
-          {historySongs.map((s,i) => <LibrarySongItem key={i} song={s} onClick={() => handlePlay(s.id)}/>)}
+          {historySongs.map((s,i) => <LibrarySongItem key={i} song={s} onClick={() => handlePlay(s.id, historySongs)}/>)}
        </div>
     );
   };
