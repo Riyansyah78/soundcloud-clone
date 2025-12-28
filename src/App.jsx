@@ -6,6 +6,7 @@ import AuthModal from './components/Auth/AuthModal';
 import UploadModal from './components/Upload/UploadModal';
 import Player from './components/Player/Player'; 
 import MobileMenu from './components/Layout/MobileMenu';
+import MobileBottomBar from './components/Layout/MobileBottomBar';
 import Search from './pages/Search';
 import SongPage from './pages/SongPage';
 import AdminDashboard from './pages/Admindashboard';
@@ -21,6 +22,7 @@ function App() {
       <AuthModal />
       <UploadModal />
       <MobileMenu />
+      <MobileBottomBar />
       <div className="flex h-screen bg-sc-dark text-white">
         
         {/* Sidebar: Fixed width di kiri */}
@@ -31,7 +33,7 @@ function App() {
           
           <Header />
           
-          <div className="flex-1 overflow-y-auto px-6 py-2 pb-24">
+          <div className="flex-1 overflow-y-auto px-6 py-2 pb-32 md:pb-24">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<Search />} />

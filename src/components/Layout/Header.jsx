@@ -53,22 +53,7 @@ const Header = ({ className, children }) => {
           </button>
         </div>
 
-        {/* --- MOBILE NAVIGATION (Home & Search) --- */}
-        <div className="flex md:hidden gap-x-2 items-center">
-          <button 
-            onClick={() => navigate('/')}
-            className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition"
-          >
-            {/* INI YANG MENYEBABKAN ERROR JIKA IMPORT HILANG */}
-            <Home className="text-black" size={20} />
-          </button>
-          <button 
-             onClick={() => navigate('/search')}
-             className="rounded-full p-2 bg-white flex items-center justify-center hover:opacity-75 transition"
-          >
-            <Search className="text-black" size={20} />
-          </button>
-        </div>
+        {/* --- MOBILE NAVIGATION sudah dipindahkan ke MobileBottomBar --- */}
 
         {/* --- AUTH BUTTONS --- */}
         <div className="flex justify-between items-center gap-x-4">
