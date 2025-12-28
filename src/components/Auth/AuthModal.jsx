@@ -43,7 +43,6 @@ const AuthModal = () => {
           password: data.password,
         });
         if (error) throw error;
-        alert('Cek email Anda untuk verifikasi!');
         onClose();
         reset();
       } else {
