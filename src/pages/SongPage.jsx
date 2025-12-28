@@ -314,7 +314,7 @@ const SongPage = () => {
                   className="bg-transparent flex-1 px-3 text-sm focus:outline-none text-white h-full"
                 />
              </form>
-             {/* ... Tombol Like/Share ... */}
+             {/* ... Like/Share Buttons ... */}
              <div className="flex flex-wrap justify-between items-center mt-1 gap-2">
                 <div className="flex gap-x-2">
                   <button onClick={handleToggleLike} className={`flex items-center gap-x-2 px-3 py-1 border rounded-sm text-sm transition ${isLiked ? 'border-sc-orange text-sc-orange' : 'border-neutral-600 text-neutral-300'}`}>

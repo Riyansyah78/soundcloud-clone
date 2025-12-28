@@ -70,7 +70,7 @@ const Profile = () => {
 
     // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      showMessage("error", "Ukuran file maksimal 2MB!");
+      showMessage("error", "Maximum file size is 2MB!");
       return;
     }
 
@@ -103,9 +103,9 @@ const Profile = () => {
       if (updateError) throw updateError;
 
       setAvatarUrl(avatarUrlWithCache);
-      showMessage("success", "Foto profil berhasil diubah!");
+      showMessage("success", "Profile photo changed successfully!");
     } catch (error) {
-      showMessage("error", "Gagal upload foto: " + error.message);
+      showMessage("error", "Failed to upload photo: " + error.message);
     } finally {
       setAvatarLoading(false);
     }
@@ -119,7 +119,7 @@ const Profile = () => {
         data: { display_name: data.displayName },
       });
       if (error) throw error;
-      showMessage("success", "Nama berhasil diubah!");
+      showMessage("success", "Name changed successfully!");
     } catch (error) {
       showMessage("error", error.message);
     } finally {
@@ -130,15 +130,15 @@ const Profile = () => {
   // Change Password
   const onPasswordSubmit = async (data) => {
     if (!data.currentPassword) {
-      showMessage("error", "Password saat ini harus diisi!");
+      showMessage("error", "Current password is required!");
       return;
     }
     if (data.newPassword !== data.confirmPassword) {
-      showMessage("error", "Password baru tidak cocok!");
+      showMessage("error", "New passwords do not match!");
       return;
     }
     if (data.newPassword.length < 6) {
-      showMessage("error", "Password minimal 6 karakter!");
+      showMessage("error", "Password must be at least 6 characters!");
       return;
     }
 
@@ -150,7 +150,7 @@ const Profile = () => {
         password: data.currentPassword,
       });
       if (signInError) {
-        showMessage("error", "Password saat ini salah!");
+        showMessage("error", "Current password is incorrect!");
         setPasswordLoading(false);
         return;
       }
@@ -160,7 +160,7 @@ const Profile = () => {
         password: data.newPassword,
       });
       if (error) throw error;
-      showMessage("success", "Password berhasil diubah!");
+      showMessage("success", "Password changed successfully!");
       resetPasswordForm();
     } catch (error) {
       showMessage("error", error.message);
@@ -181,7 +181,7 @@ const Profile = () => {
       if (error) throw error;
       showMessage(
         "success",
-        "Link reset password telah dikirim ke email Anda!"
+        "Password reset link has been sent to your email!"
       );
     } catch (error) {
       showMessage("error", error.message);
@@ -277,7 +277,7 @@ const Profile = () => {
           </div>
           <p className="text-neutral-500 text-xs">
             Member since{" "}
-            {new Date(user?.created_at).toLocaleDateString("id-ID", {
+            {new Date(user?.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
@@ -352,8 +352,8 @@ const Profile = () => {
             Email
           </h3>
           <p className="text-neutral-400 text-sm mb-4">
-            Kirim link reset password ke email Anda ({user?.email}). Link akan
-            aktif selama 24 jam.
+            Send a password reset link to your email ({user?.email}). The link will
+            be active for 24 hours.
           </p>
           <button
             onClick={handleResetPassword}

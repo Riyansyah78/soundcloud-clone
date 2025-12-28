@@ -45,11 +45,11 @@ const ResetPassword = () => {
 
   const onSubmit = async (data) => {
     if (data.newPassword !== data.confirmPassword) {
-      showMessage('error', 'Password tidak cocok!');
+      showMessage('error', 'Passwords do not match!');
       return;
     }
     if (data.newPassword.length < 6) {
-      showMessage('error', 'Password minimal 6 karakter!');
+      showMessage('error', 'Password must be at least 6 characters!');
       return;
     }
 
@@ -60,7 +60,7 @@ const ResetPassword = () => {
       });
       if (error) throw error;
       
-      showMessage('success', 'Password berhasil diubah! Mengalihkan ke home...');
+      showMessage('success', 'Password changed successfully! Redirecting to home...');
       setTimeout(() => navigate('/'), 2000);
     } catch (error) {
       showMessage('error', error.message);
@@ -120,7 +120,7 @@ const ResetPassword = () => {
         <h1 className="text-2xl font-bold text-white mb-2">Reset Password</h1>
         
         <p className="text-neutral-400 mb-6 text-sm">
-          Masukkan password baru untuk akun Anda.
+          Enter a new password for your account.
         </p>
 
         {/* Message */}
