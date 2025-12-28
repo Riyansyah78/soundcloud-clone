@@ -22,14 +22,14 @@ const Player = () => {
   const urlRef = useRef(''); 
   const songPathUrl = useLoadSongUrl(song);
   
-  // Ref untuk track lagu sebelumnya agar tidak double play
+  // Ref to track previous song to prevent double play
   const prevActiveIdRef = useRef(null);
 
   // 1. Fetch Lagu
   useEffect(() => {
     if (!player.activeId) return;
 
-    // Jika lagu berubah, reset state
+    // If song changes, reset state
     if (prevActiveIdRef.current !== player.activeId) {
       prevActiveIdRef.current = player.activeId;
       setSeek(0);
@@ -47,10 +47,10 @@ const Player = () => {
       setSong(data);
       if (data) {
         player.setIsPlaying(true);
-// Cek apakah user login
+// Check if user is logged in
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user && data) {
-         // Upsert ke tabel history (Jika sudah ada, update waktunya)
+         // Upsert to history table (If exists, update the timestamp)
          await supabase.from('history').upsert({
             user_id: session.user.id,
             song_id: data.id,
@@ -124,8 +124,8 @@ const Player = () => {
       player.setIsPlaying(true);
     }
 
-    // Jika user baru selesai seek, posisi audio sudah tepat
-    // Jadi kita tidak perlu force seek lagi
+    // If user just finished seeking, audio position is already correct
+    // So we don't need to force seek again
     if (soundRef.current && isSeekingRef.current) {
       soundRef.current.seek(requestedSeekRef.current);
     }

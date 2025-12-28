@@ -59,7 +59,7 @@ const Profile = () => {
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
-    alert(text); // Popup alert agar lebih terlihat
+    alert(text); // Popup alert to be more visible
     setTimeout(() => setMessage({ type: "", text: "" }), 5000);
   };
 

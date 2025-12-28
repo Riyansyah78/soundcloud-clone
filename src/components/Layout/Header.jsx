@@ -11,14 +11,14 @@ const Header = ({ className, children }) => {
   const [user, setUser] = React.useState(null);
 
   React.useEffect(() => {
-    // Cek User Login Status
+    // Check User Login Status
     const checkUser = async () => {
        const { data: { session } } = await supabase.auth.getSession();
        setUser(session?.user ?? null);
     };
     checkUser();
 
-    // Listener jika login/logout berubah
+    // Listener for login/logout state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
         setUser(session?.user ?? null);
     });
@@ -37,7 +37,7 @@ const Header = ({ className, children }) => {
     <div className={`h-fit bg-gradient-to-b from-emerald-800 p-6 ${className}`}>
       <div className="w-full mb-4 flex items-center justify-between">
         
-        {/* --- DESKTOP NAVIGATION (Panah) --- */}
+        {/* --- DESKTOP NAVIGATION (Arrows) --- */}
         <div className="hidden md:flex gap-x-2 items-center">
           <button 
             onClick={() => navigate(-1)} 
@@ -53,7 +53,7 @@ const Header = ({ className, children }) => {
           </button>
         </div>
 
-        {/* --- MOBILE NAVIGATION sudah dipindahkan ke MobileBottomBar --- */}
+        {/* --- MOBILE NAVIGATION moved to MobileBottomBar --- */}
 
         {/* --- AUTH BUTTONS --- */}
         <div className="flex justify-between items-center gap-x-4">

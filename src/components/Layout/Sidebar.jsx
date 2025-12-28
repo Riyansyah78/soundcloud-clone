@@ -18,9 +18,9 @@ const Sidebar = ({ children }) => {
   const [playlists, setPlaylists] = useState([]);
   const [user, setUser] = useState(null);
 
-  // 4. CEK SESSION USER (Mirip seperti di Header/MobileMenu)
+  // 4. CHECK USER SESSION (Similar to Header/MobileMenu)
   useEffect(() => {
-    // Cek session awal
+    // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
@@ -40,13 +40,13 @@ const Sidebar = ({ children }) => {
     fetchPlaylists();
   }, []);
 
-  // 5. FUNGSI PENGECEKAN LOGIN
+  // 5. LOGIN CHECK FUNCTION
   const handleUploadClick = () => {
     if (!user) {
-      // Jika belum login, buka modal Login
+      // If not logged in, open Login modal
       return authModal.onOpen();
     }
-    // Jika sudah login, buka modal Upload
+    // If logged in, open Upload modal
     return uploadModal.onOpen();
   };
 
@@ -66,7 +66,7 @@ const Sidebar = ({ children }) => {
               <SidebarItem key={item.label} {...item} />
             ))}
 
-            {/* 6. GUNAKAN FUNGSI handleUploadClick DI SINI */}
+            {/* 6. USE handleUploadClick FUNCTION HERE */}
             <div 
                onClick={handleUploadClick} 
                className="flex flex-row h-auto items-center w-full gap-x-4 text-md font-medium cursor-pointer hover:text-white transition text-neutral-400 py-1"

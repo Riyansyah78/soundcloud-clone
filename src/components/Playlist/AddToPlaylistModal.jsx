@@ -4,9 +4,9 @@ import { X, Music, CheckCircle, PlusCircle, Loader2 } from 'lucide-react';
 
 const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
   const [playlists, setPlaylists] = useState([]);
-  const [addedPlaylistIds, setAddedPlaylistIds] = useState([]); // Menyimpan ID playlist yang sudah berisi lagu ini
+  const [addedPlaylistIds, setAddedPlaylistIds] = useState([]); // Store IDs of playlists that already contain this song
   const [loading, setLoading] = useState(true);
-  const [processingId, setProcessingId] = useState(null); // Loading per tombol
+  const [processingId, setProcessingId] = useState(null); // Loading per button
 
   useEffect(() => {
     if (isOpen && songId) {
@@ -19,7 +19,7 @@ const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
-    // 1. Ambil semua Playlist User
+    // 1. Get all User Playlists
     const { data: myPlaylists } = await supabase
       .from('playlists')
       .select('*')
@@ -28,15 +28,15 @@ const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
 
     if (myPlaylists) setPlaylists(myPlaylists);
 
-    // 2. Cek di playlist mana lagu ini SUDAH ada
-    // Kita cari di tabel playlist_songs berdasarkan song_id
+    // 2. Check which playlists this song is ALREADY in
+    // We search in playlist_songs table by song_id
     const { data: existingData } = await supabase
       .from('playlist_songs')
       .select('playlist_id')
       .eq('song_id', songId);
 
     if (existingData) {
-      // Buat array ID: contoh [12, 15]
+      // Create ID array: e.g. [12, 15]
       const ids = existingData.map(item => item.playlist_id);
       setAddedPlaylistIds(ids);
     }
@@ -46,11 +46,11 @@ const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
   const handleTogglePlaylist = async (playlistId) => {
     setProcessingId(playlistId);
     
-    // Cek apakah lagu sudah ada di playlist ini?
+    // Check if song already exists in this playlist
     const isAlreadyAdded = addedPlaylistIds.includes(playlistId);
 
     if (isAlreadyAdded) {
-      // LOGIC: REMOVE (Hapus dari playlist)
+      // LOGIC: REMOVE (Remove from playlist)
       const { error } = await supabase
         .from('playlist_songs')
         .delete()
@@ -58,11 +58,11 @@ const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
         .eq('song_id', songId);
 
       if (!error) {
-        // Update UI: Hapus ID dari state
+        // Update UI: Remove ID from state
         setAddedPlaylistIds(prev => prev.filter(id => id !== playlistId));
       }
     } else {
-      // LOGIC: ADD (Tambah ke playlist)
+      // LOGIC: ADD (Add to playlist)
       const { error } = await supabase
         .from('playlist_songs')
         .insert({
@@ -71,7 +71,7 @@ const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
         });
 
       if (!error) {
-        // Update UI: Tambah ID ke state
+        // Update UI: Add ID to state
         setAddedPlaylistIds(prev => [...prev, playlistId]);
       }
     }
@@ -103,7 +103,7 @@ const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
              </p>
            ) : (
              playlists.map(pl => {
-               const isAdded = addedPlaylistIds.includes(pl.id); // Cek status
+               const isAdded = addedPlaylistIds.includes(pl.id); // Check status
                const isProcessing = processingId === pl.id;
 
                return (
@@ -114,8 +114,8 @@ const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
                    className={`
                      flex items-center justify-between w-full p-3 rounded-md transition border
                      ${isAdded 
-                        ? 'bg-sc-orange/10 border-sc-orange/50 text-white' // Style jika SUDAH ada (Hijau/Orange)
-                        : 'bg-neutral-800/50 border-transparent hover:bg-neutral-800 text-neutral-300 hover:text-white' // Style jika BELUM ada
+                        ? 'bg-sc-orange/10 border-sc-orange/50 text-white' // Style if ALREADY added (Green/Orange)
+                        : 'bg-neutral-800/50 border-transparent hover:bg-neutral-800 text-neutral-300 hover:text-white' // Style if NOT added
                      }
                    `}
                  >
@@ -129,7 +129,7 @@ const AddToPlaylistModal = ({ isOpen, onClose, songId }) => {
                      <span className="font-medium truncate">{pl.name}</span>
                    </div>
 
-                   {/* Indikator Status (Kanan) */}
+                   {/* Status Indicator (Right) */}
                    <div className="pl-3">
                       {isProcessing ? (
                         <Loader2 size={20} className="animate-spin text-neutral-500"/>

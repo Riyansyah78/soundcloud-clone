@@ -90,7 +90,7 @@ const ResetPassword = () => {
           <h1 className="text-2xl font-bold text-white mb-2">Invalid or Expired Link</h1>
           
           <p className="text-neutral-400 mb-8 text-sm leading-relaxed">
-            Link reset password tidak valid atau sudah expired. Silakan request link baru.
+            Reset password link is invalid or has expired. Please request a new link.
           </p>
 
           <button 

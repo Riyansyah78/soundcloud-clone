@@ -15,19 +15,19 @@ const PlaylistPage = () => {
 
   useEffect(() => {
     const fetchPlaylistData = async () => {
-      // 1. Ambil Info Playlist
+      // 1. Get Playlist Info
       const { data: plData } = await supabase.from('playlists').select('*').eq('id', id).single();
       setPlaylist(plData);
 
-      // 2. Ambil Lagu-lagu dalam Playlist ini (Join)
+      // 2. Get Songs in this Playlist (Join)
       const { data: songData, error } = await supabase
         .from('playlist_songs')
-        .select('*, songs(*)') // Join ke tabel songs
+        .select('*, songs(*)') // Join to songs table
         .eq('playlist_id', id)
         .order('added_at', { ascending: true });
 
       if (songData) {
-         // Filter jika ada lagu yang terhapus (null)
+         // Filter if any songs have been deleted (null)
          setSongs(songData.map(item => item.songs).filter(Boolean));
       }
     };
@@ -42,7 +42,7 @@ const PlaylistPage = () => {
   };
 
   const handleDeleteSong = async (songId) => {
-    // Hapus dari tabel penghubung
+    // Delete from junction table
     const { error } = await supabase
       .from('playlist_songs')
       .delete()

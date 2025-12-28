@@ -8,15 +8,15 @@ import { Search as SearchIcon } from 'lucide-react';
 const Search = () => {
   const player = usePlayerStore();
   const [value, setValue] = useState(""); // Input text user
-  const debouncedValue = useDebounce(value, 500); // Input text yang sudah di-delay
+  const debouncedValue = useDebounce(value, 500); // Input text that has been delayed
   const [songs, setSongs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Fungsi search ke Supabase
+    // Search function to Supabase
     const fetchSongs = async () => {
       if (!debouncedValue) {
-        setSongs([]); // Kosongkan jika input kosong
+        setSongs([]); // Clear if input is empty
         return;
       }
 
@@ -25,8 +25,8 @@ const Search = () => {
       const { data, error } = await supabase
         .from('songs')
         .select('*')
-        .eq('status', 'approved') // Hanya ambil lagu yang sudah disetujui
-        .or(`title.ilike.%${debouncedValue}%,author.ilike.%${debouncedValue}%`) // Cari di Title ATAU Author
+        .eq('status', 'approved') // Only get approved songs
+        .or(`title.ilike.%${debouncedValue}%,author.ilike.%${debouncedValue}%`) // Search in Title OR Author
         .order('created_at', { ascending: false });
 
       if (error) console.log(error);
@@ -36,9 +36,9 @@ const Search = () => {
     }
 
     fetchSongs();
-  }, [debouncedValue]); // Jalankan ulang setiap kali debouncedValue berubah
+  }, [debouncedValue]); // Re-run every time debouncedValue changes
 
-  // Handler Play
+  // Play Handler
   const handlePlay = (id) => {
     player.setId(id);
     player.setIds(songs.map((song) => song.id));

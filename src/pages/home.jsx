@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'; // <-- Pastikan baris ini lengkap
+import React, { useEffect, useState } from 'react'; // <-- Make sure this line is complete
 import { supabase } from '../services/supabaseClient';
 import SongItem from '../components/Song/SongItem';
 import usePlayerStore from '../store/usePlayerStore';
@@ -6,16 +6,16 @@ import usePlayerStore from '../store/usePlayerStore';
 
 const Home = () => {
   const [songs, setSongs] = useState([]);
-  const player = usePlayerStore(); // Panggil state global player
+  const player = usePlayerStore(); // Call global player state
 
   useEffect(() => {
-    // Fungsi untuk mengambil data lagu dari tabel 'songs'
+    // Function to fetch song data from 'songs' table
     const fetchSongs = async () => {
       const { data, error } = await supabase
         .from('songs')
         .select('*')
-        .eq('status', 'approved') // Hanya ambil lagu yang sudah disetujui
-        .order('created_at', { ascending: false }); // Lagu terbaru di atas
+        .eq('status', 'approved') // Only get approved songs
+        .order('created_at', { ascending: false }); // Newest songs on top
 
       if (error) {
         console.log(error);
@@ -28,7 +28,7 @@ const Home = () => {
   }, []);
 
   const handlePlay = (id) => {
-    // Set lagu yang aktif & set playlist agar tombol next/prev berfungsi
+    // Set active song & set playlist so next/prev buttons work
     player.setId(id); 
     player.setIds(songs.map((song) => song.id)); 
   };
@@ -42,7 +42,7 @@ const Home = () => {
           </h1>
         </div>
         
-        {/* Grid Layout untuk Lagu */}
+        {/* Grid Layout for Songs */}
         <div className="
           grid 
           grid-cols-2 

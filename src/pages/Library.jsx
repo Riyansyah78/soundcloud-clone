@@ -5,7 +5,7 @@ import useLoadImage from '../hooks/useLoadImage';
 import { Play, Heart, Clock, ListMusic, PlusCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-// --- KOMPONEN KECIL: Song Row Item ---
+// --- SMALL COMPONENT: Song Row Item ---
 const LibrarySongItem = ({ song, onClick, subtitle, icon: Icon }) => {
   const imageUrl = useLoadImage(song);
   return (
@@ -34,7 +34,7 @@ const Library = () => {
   const [activeTab, setActiveTab] = useState('overview'); 
   const [likedSongs, setLikedSongs] = useState([]);
   const [historySongs, setHistorySongs] = useState([]);
-  const [myPlaylists, setMyPlaylists] = useState([]); // State Playlist
+  const [myPlaylists, setMyPlaylists] = useState([]); // Playlist State
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const Library = () => {
     const { data: historyData } = await supabase.from('history').select('*, songs(*)').eq('user_id', userId).order('played_at', { ascending: false }).limit(20);
     if (historyData) setHistorySongs(historyData.map(item => item.songs).filter(s => s));
 
-    // 3. PLAYLISTS (BARU)
+    // 3. PLAYLISTS (NEW)
     const { data: plData } = await supabase.from('playlists').select('*').eq('user_id', userId).order('created_at', { ascending: false });
     if (plData) setMyPlaylists(plData);
   };
@@ -72,7 +72,7 @@ const Library = () => {
     player.setIsPlaying(true);
   };
 
-  // FUNGSI BUAT PLAYLIST BARU
+  // CREATE NEW PLAYLIST FUNCTION
   const handleCreatePlaylist = async () => {
      const name = prompt("Enter playlist name:");
      if(!name || !user) return;
@@ -83,7 +83,7 @@ const Library = () => {
      }).select();
 
      if(data) {
-        setMyPlaylists([data[0], ...myPlaylists]); // Update UI langsung
+        setMyPlaylists([data[0], ...myPlaylists]); // Update UI immediately
      }
   };
 
@@ -139,15 +139,15 @@ const Library = () => {
               {myPlaylists.map(pl => (
                  <div 
                     key={pl.id} 
-                    // PERBAIKAN DI SINI: Navigasi ke halaman detail playlist
+                    // FIX HERE: Navigate to playlist detail page
                     onClick={() => navigate(`/playlist/${pl.id}`)} 
                     className="bg-neutral-800/50 p-4 rounded-md hover:bg-neutral-800 cursor-pointer transition group"
                  >
                     <div className="w-full aspect-square bg-neutral-700 rounded-md mb-3 flex items-center justify-center shadow-lg group-hover:shadow-xl transition relative overflow-hidden">
-                       {/* Jika ada image_path bisa ditampilkan, jika tidak pakai icon default */}
+                       {/* If image_path exists, display it; otherwise use default icon */}
                        <ListMusic size={40} className="text-neutral-500 group-hover:text-white transition duration-300 transform group-hover:scale-110"/>
                        
-                       {/* Overlay Play Icon saat hover (Opsional, biar makin keren) */}
+                       {/* Play Icon Overlay on hover (Optional, for better aesthetics) */}
                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
                           <Play fill="white" className="text-white drop-shadow-lg"/>
                        </div>
@@ -168,7 +168,7 @@ const Library = () => {
       );
     }
 
-    // Tab Liked & History (Kode sama seperti sebelumnya, dipersingkat di sini)
+    // Tab Liked & History (Same code as before, shortened here)
     return activeTab === 'liked' ? (
        <div className="flex flex-col gap-1">
           <h2 className="text-white text-3xl font-bold mb-4">Liked Songs</h2>

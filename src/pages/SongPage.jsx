@@ -8,14 +8,14 @@ import { Play, Pause, Heart, Share, MessageSquare, User, Trash2 } from 'lucide-r
 import AddToPlaylistModal from '../components/Playlist/AddToPlaylistModal';
 import { PlusSquare } from 'lucide-react';
 
-// --- KOMPONEN WAVEFORM ASLI (Real Audio Analysis) ---
+// --- REAL WAVEFORM COMPONENT (Real Audio Analysis) ---
 const RealWaveform = ({ songUrl, isActive }) => {
   const canvasRef = useRef(null);
   const { currentTime, duration } = usePlayerStore();
   const [peaks, setPeaks] = useState([]); 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // 1. ANALISIS AUDIO (Jalan sekali saat lagu dimuat)
+  // 1. AUDIO ANALYSIS (Runs once when song is loaded)
  useEffect(() => {
     if (!songUrl) return;
 
@@ -28,7 +28,7 @@ const RealWaveform = ({ songUrl, isActive }) => {
         const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
         
         const rawData = audioBuffer.getChannelData(0); 
-        const samples = 100; // Jumlah batang (Bisa dinaikkan biar lebih rapat)
+        const samples = 100; // Number of bars (Can be increased for denser bars)
         const blockSize = Math.floor(rawData.length / samples);
         const calculatedPeaks = [];
 
@@ -53,7 +53,7 @@ const RealWaveform = ({ songUrl, isActive }) => {
     analyze();
   }, [songUrl]);
 
-  // 2. GAMBAR KE CANVAS
+  // 2. DRAW TO CANVAS
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -73,11 +73,11 @@ const RealWaveform = ({ songUrl, isActive }) => {
     const gap = 2; 
     const barWidth = (width / peaks.length) - gap;
     
-    // Hitung lebar area Oranye secara Pixel-Perfect
+    // Calculate orange area width pixel-perfect
     const progressRatio = (isActive && duration > 0) ? currentTime / duration : 0;
     const activeWidth = width * progressRatio;
 
-    // --- FUNGSI GAMBAR BATANG (Helper) ---
+    // --- BAR DRAWING FUNCTION (Helper) ---
     const drawBars = (color) => {
       ctx.fillStyle = color;
       peaks.forEach((peak, index) => {
@@ -86,26 +86,26 @@ const RealWaveform = ({ songUrl, isActive }) => {
         const x = index * (barWidth + gap);
         const y = height - barHeight;
         
-        // Menggunakan rounded corner (opsional, biar cantik)
+        // Using rounded corners (optional, for aesthetics)
         ctx.fillRect(x, y, barWidth, barHeight);
       });
     };
 
-    // A. GAMBAR LAYER BELAKANG (PUTIH/ABU)
-    // Gambar semua batang dengan warna redup dulu
+    // A. DRAW BACKGROUND LAYER (WHITE/GRAY)
+    // Draw all bars with muted color first
     drawBars('rgba(255, 255, 255, 0.5)');
 
-    // B. GAMBAR LAYER DEPAN (ORANYE) DENGAN CLIPPING
-    // Ini rahasia smooth-nya: Kita potong canvas sesuai detik lagu
-    ctx.save(); // Simpan kondisi canvas
+    // B. DRAW FRONT LAYER (ORANGE) WITH CLIPPING
+    // This is the secret to smooth animation: We clip canvas according to song position
+    ctx.save(); // Save canvas state
     ctx.beginPath();
-    ctx.rect(0, 0, activeWidth, height); // Kotak area oranye (lebar bertambah pixel demi pixel)
-    ctx.clip(); // Potong! Apapun yang digambar setelah ini hanya muncul di dalam kotak tadi.
+    ctx.rect(0, 0, activeWidth, height); // Orange area box (width increases pixel by pixel)
+    ctx.clip(); // Clip! Anything drawn after this only appears inside the box.
 
-    // Gambar ulang batang yang sama persis tapi warna oranye
+    // Redraw the same bars but with orange color
     drawBars('#ff5500');
 
-    ctx.restore(); // Kembalikan canvas ke kondisi normal (biar gak error render berikutnya)
+    ctx.restore(); // Restore canvas to normal state (to avoid render errors)
 
   }, [peaks, isAnalyzing, currentTime, duration, isActive]);
 
@@ -118,7 +118,7 @@ const RealWaveform = ({ songUrl, isActive }) => {
       )}
       <canvas 
         ref={canvasRef}
-        width={800} // Resolusi internal canvas (makin besar makin tajam)
+        width={800} // Internal canvas resolution (higher = sharper)
         height={150}
         className="w-full h-full"
       />
@@ -145,7 +145,7 @@ const SongPage = () => {
 
   const imageUrl = useLoadImage(song);
   
-  // URL PUBLIK UNTUK ANALISIS WAVEFORM
+  // PUBLIC URL FOR WAVEFORM ANALYSIS
   const songPublicUrl = song 
     ? supabase.storage.from('songs').getPublicUrl(song.song_path).data.publicUrl 
     : null;
@@ -294,7 +294,7 @@ const SongPage = () => {
 
       {/* CONTENT GRID */}
       <div className="px-4 md:px-8 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10">
-        {/* KOLOM KIRI: Comments & Actions */}
+        {/* LEFT COLUMN: Comments & Actions */}
         <div className="flex flex-col gap-y-6">
           <div className="flex flex-col gap-4">
              <form onSubmit={handlePostComment} className="flex items-center w-full bg-neutral-800 border border-neutral-700 h-10 px-0.5 rounded-sm overflow-hidden">
@@ -368,7 +368,7 @@ const SongPage = () => {
           </div>
         </div>
 
-        {/* KOLOM KANAN: Related */}
+        {/* RIGHT COLUMN: Related */}
         <div className="hidden lg:flex flex-col gap-y-6 border-l border-neutral-800 pl-6">
              <div className="flex flex-col gap-y-2">
                 <div className="text-neutral-400 text-sm font-semibold mb-2 uppercase">More from {song.author}</div>
@@ -389,7 +389,7 @@ const SongPage = () => {
       <AddToPlaylistModal 
         isOpen={isPlaylistModalOpen} 
         onClose={() => setIsPlaylistModalOpen(false)} 
-        songId={id} // ID lagu dari params URL
+        songId={id} // Song ID from URL params
      />
     </div>
   );

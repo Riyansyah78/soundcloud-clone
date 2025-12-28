@@ -85,8 +85,8 @@ const StaticWaveform = ({ songUrl, isPlaying }) => {
       const x = index * (barWidth + gap);
       const y = height - barHeight;
 
-      // Logic Warna:
-      // Apakah batang ini sudah dilewati durasi lagu?
+      // Color Logic:
+      // Has this bar been passed by the song duration?
       // index / total_batang < persentase_lagu
       if (index / waveformData.length < progressPercent) {
         ctx.fillStyle = '#ff5500'; // SoundCloud Orange (Sudah diputar)
