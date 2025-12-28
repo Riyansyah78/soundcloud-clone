@@ -81,7 +81,7 @@ const Header = ({ className, children }) => {
                     Logout
                 </button>
                 <button 
-                    onClick={() => navigate('/library')}
+                    onClick={() => navigate('/profile')}
                     className="bg-white p-2 rounded-full hover:scale-105 transition"
                 >
                     <User size={20} className="text-black"/>

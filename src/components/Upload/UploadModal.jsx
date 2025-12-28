@@ -44,7 +44,8 @@ const UploadModal = () => {
         title: data.title,
         author: data.author,
         image_path: imageData.path,
-        song_path: songData.path
+        song_path: songData.path,
+        status: 'approved' // Langsung approved tanpa menunggu konfirmasi admin
       });
 
       if (supabaseError) throw supabaseError;

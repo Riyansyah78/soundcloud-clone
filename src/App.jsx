@@ -12,6 +12,8 @@ import AdminDashboard from './pages/Admindashboard';
 import Library from './pages/Library';
 import PlaylistPage from './pages/PlaylistPage';
 import VerifySuccess from './pages/VerifySuccess';
+import Profile from './pages/Profile';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -38,6 +40,8 @@ function App() {
               <Route path="/library" element={<Library />} />
               <Route path="/playlist/:id" element={<PlaylistPage />} />
               <Route path="/verify-success" element={<VerifySuccess />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
             </Routes>
           </div>
 

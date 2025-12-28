@@ -209,7 +209,9 @@ const SongPage = () => {
       content: newComment,
       song_id: id,
       user_id: user.id,
-      user_email: user.email
+      user_email: user.email,
+      user_name: user.user_metadata?.display_name || user.email.split('@')[0],
+      user_avatar: user.user_metadata?.avatar_url || null
     });
     if (!error) {
       setNewComment("");
@@ -296,8 +298,14 @@ const SongPage = () => {
         <div className="flex flex-col gap-y-6">
           <div className="flex flex-col gap-4">
              <form onSubmit={handlePostComment} className="flex items-center w-full bg-neutral-800 border border-neutral-700 h-10 px-0.5 rounded-sm overflow-hidden">
-                <div className="w-10 h-full flex items-center justify-center bg-gradient-to-br from-neutral-700 to-neutral-600">
-                   <User className="text-white" size={20}/>
+                <div className="w-10 h-10 flex items-center justify-center overflow-hidden shrink-0">
+                   {user?.user_metadata?.avatar_url ? (
+                     <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                   ) : (
+                     <div className="w-full h-full bg-gradient-to-br from-neutral-700 to-neutral-600 flex items-center justify-center">
+                       <User className="text-white" size={20}/>
+                     </div>
+                   )}
                 </div>
                 <input 
                   value={newComment}
@@ -336,12 +344,18 @@ const SongPage = () => {
             <div className="flex flex-col gap-y-4">
                {comments.length === 0 ? <p className="text-neutral-500 text-sm">No comments yet.</p> : comments.map((c) => (
                   <div key={c.id} className="group flex gap-x-3 p-3 hover:bg-neutral-800/50 rounded-md transition">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-b from-purple-500 to-blue-600 flex items-center justify-center shrink-0 text-xs text-white font-bold">
-                        {c.user_email?.substring(0,2).toUpperCase()}
+                      <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
+                        {c.user_avatar ? (
+                          <img src={c.user_avatar} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-b from-purple-500 to-blue-600 flex items-center justify-center text-xs text-white font-bold">
+                            {(c.user_name || c.user_email)?.substring(0,2).toUpperCase()}
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col flex-1">
                           <div className="flex justify-between">
-                            <span className="text-neutral-400 text-xs">{c.user_email} • {timeAgo(c.created_at)}</span>
+                            <span className="text-neutral-400 text-xs">{c.user_name || c.user_email} • {timeAgo(c.created_at)}</span>
                             {user?.id === c.user_id && (
                               <button onClick={() => handleDeleteComment(c.id)} className="text-neutral-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><Trash2 size={14}/></button>
                             )}
